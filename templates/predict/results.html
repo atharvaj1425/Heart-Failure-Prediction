@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #007bff; /* Heading color */
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        li {
+            background: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s; /* Animation for hover */
+        }
+
+        li:hover {
+            transform: scale(1.02); /* Slight zoom effect on hover */
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Chart container style */
+        #myChart {
+            max-width: 800px; /* Increased chart width */
+            margin: 30px auto; /* Centered with margin */
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px; /* Max width for the content */
+            margin: 0 auto; /* Centered content */
+        }
+
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 24px; /* Responsive heading */
+            }
+
+            #myChart {
+                max-width: 100%; /* Full width on smaller screens */
+            }
+
+            a {
+                width: 100%; /* Full width button on smaller screens */
+                text-align: center; /* Center text on button */
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Heart Disease Predictions</h2>
+        <ul>
+            {% for model, prediction in predictions.items %}
+                <li>{{ model }}: {{ prediction }}</li>
+            {% endfor %}
+        </ul>
+        
+        <!-- Canvas for the chart -->
+        <canvas id="myChart"></canvas>
+
+        <a href="{% url 'home' %}">Go back</a>
+    </div>
+
+    <script>
+        // Data for the chart
+        const labels = {{ chart_labels|safe }};
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Model Prediction',
+                data: {{ chart_data|safe }},
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return value === 1 ? 'Heart Disease' : 'No Heart Disease';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#333'
+                        }
+                    }
+                }
+            },
+        };
+
+        // Render the chart
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    </script>
+</body>
+</html>
